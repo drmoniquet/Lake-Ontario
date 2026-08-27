@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <!--
-  lake ontario — a flip book.
-
-  Twelve leaves hinged at the left edge: an empty lake, the poem filling it line
-  by line, and a note. Click, tap or press a key to turn one. Hold a key down
-  and it riffles. Past the last leaf it comes back to the first.
-
-  The pages are live text, not pictures, so the lake stays sharp at any size and
-  every measurement is the print measurement (a 3300 x 2550 px page at 300 dpi)
-  divided down to fit the screen. One file, no build step. Save as index.html.
+ l a k e o n t a r i o - a concrete poem
 -->
 <html lang="en-CA">
 <head>
@@ -38,8 +30,7 @@
     overflow:hidden;
   }
 
-  /* The book. Perspective is what makes a turning leaf read as paper rather
-     than as a rotating rectangle. */
+  /* The book design */
   .book{
     position:relative; width:var(--pw); aspect-ratio:11 / 8.5;
     perspective:2400px; perspective-origin:0% 50%;
@@ -102,7 +93,7 @@
   }
   .hint.gone{ opacity:0; }
 
-  /* No rotation for anyone who has asked their system to keep still. */
+  /*  */
   @media (prefers-reduced-motion:reduce){
     .leaf{ transition:none; }
     .book{ perspective:none; }
@@ -377,8 +368,7 @@
     leaf.classList.add("turned");
     at++;
 
-    // The last leaf turns away onto the copy of the cover underneath, so the
-    // book is already showing page one again. Restack while it's identical.
+    // Resetting w/ last leaf at copy of the cover underneath//
     if (at === stack.length){
       resetting = true;
       setTimeout(() => {
@@ -407,8 +397,8 @@
     }
   });
 
-  /* Cutive Mono's advance width isn't guaranteed across platforms, so measure
-     the block once the font is in and scale it to the lake's exact width. */
+  /* Fontfix: Cutive Mono's width not guaranteed across platforms, so measure
+     the block once the font is in and then scale it to the lake's exact width. */
   function fit(){
     const target = 2900 * (book.clientWidth / 3300);
     document.querySelectorAll(".grid").forEach(pre => {
