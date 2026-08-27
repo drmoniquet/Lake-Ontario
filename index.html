@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<!--
+  lake ontario — a flip book.
+
+  Twelve leaves hinged at the left edge: an empty lake, the poem filling it line
+  by line, and a note. Click, tap or press a key to turn one. Hold a key down
+  and it riffles. Past the last leaf it comes back to the first.
+
+  The pages are live text, not pictures, so the lake stays sharp at any size and
+  every measurement is the print measurement (a 3300 x 2550 px page at 300 dpi)
+  divided down to fit the screen. One file, no build step. Save as index.html.
+-->
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lake ontario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eee8db;
+    --desk:#ddd4c0;
+    --ink:#1a1e18;
+    --faint:#a9a294;
+    --pw:min(92vw, calc(88vh * 11 / 8.5));
+    --u:calc(var(--pw) / 3300);
+    --turn:560ms;
+  }
+  *{box-sizing:border-box; margin:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--desk); color:var(--ink);
+    font-family:"Cutive Mono", ui-monospace, "Courier New", monospace;
+    display:grid; place-items:center;
+    cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
+    overflow:hidden;
+  }
+
+  /* The book. Perspective is what makes a turning leaf read as paper rather
+     than as a rotating rectangle. */
+  .book{
+    position:relative; width:var(--pw); aspect-ratio:11 / 8.5;
+    perspective:2400px; perspective-origin:0% 50%;
+    filter:drop-shadow(0 calc(14 * var(--u)) calc(30 * var(--u)) rgba(60,45,20,.20));
+  }
+
+  .leaf{
+    position:absolute; inset:0;
+    background:var(--paper);
+    transform-origin:left center;
+    transform:rotateY(0deg);
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    transition:transform var(--turn) cubic-bezier(.42,.03,.30,1);
+    box-shadow:-18px 0 44px rgba(60,45,20,.30);
+  }
+  .leaf.turned{ transform:rotateY(-179.9deg); }
+  .leaf.understack{ z-index:0; transform:none; transition:none; box-shadow:none; }
+
+  /* The binding edge: a little gutter shade down the left of every sheet. */
+  .leaf::before{
+    content:""; position:absolute; left:0; top:0; bottom:0;
+    width:calc(120 * var(--u));
+    background:linear-gradient(to right, rgba(90,72,40,.16), transparent);
+    pointer-events:none;
+  }
+
+  .title{
+    position:absolute; left:calc(205 * var(--u)); top:calc(516 * var(--u));
+    font-size:calc(54 * var(--u)); white-space:pre;
+  }
+  .rule{
+    position:absolute; left:calc(211 * var(--u)); top:calc(655 * var(--u));
+    width:calc(560 * var(--u)); height:2px; background:var(--faint);
+  }
+  .folio{
+    position:absolute; right:calc(205 * var(--u)); bottom:calc(210 * var(--u));
+    font-size:calc(28 * var(--u)); color:var(--faint);
+  }
+
+  .grid, .shore{
+    position:absolute;
+    left:calc(200 * var(--u)); top:calc(990 * var(--u));
+    width:calc(2900 * var(--u));
+    transform-origin:0 0;
+  }
+  .grid{ font-size:calc(35 * var(--u)); line-height:1.26; white-space:pre; }
+  .shore{ height:calc(1005 * var(--u)); }
+
+  .note{
+    position:absolute; left:calc(205 * var(--u)); top:calc(1105 * var(--u));
+    width:calc(2200 * var(--u));
+    font-size:calc(36 * var(--u)); line-height:1.72;
+  }
+  .note .by{ margin-top:calc(62 * var(--u)); }
+
+  .hint{
+    position:fixed; left:50%; bottom:3vh; transform:translateX(-50%);
+    font-size:13px; letter-spacing:.08em; color:#8d8574;
+    transition:opacity 1.2s ease;
+  }
+  .hint.gone{ opacity:0; }
+
+  /* No rotation for anyone who has asked their system to keep still. */
+  @media (prefers-reduced-motion:reduce){
+    .leaf{ transition:none; }
+    .book{ perspective:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="book" id="book">
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio"></div>
+    <svg class="shore" viewBox="200 990 2900 992" preserveAspectRatio="xMinYMin meet">
+      <path d="M 200.0,1871.6 L 247.8,1816.5 L 327.5,1739.4 L 439.0,1651.2 L 550.5,1552.0 L 646.2,1485.9 L 757.7,1419.8 L 869.2,1331.6 L 996.7,1265.5 L 1156.0,1232.4 L 1331.3,1199.4 L 1506.6,1166.3 L 1697.8,1144.3 L 1873.1,1122.2 L 2016.5,1133.3 L 2144.0,1155.3 L 2239.6,1199.4 L 2319.2,1254.5 L 2398.9,1232.4 L 2478.6,1177.3 L 2590.1,1100.2 L 2717.6,1034.1 L 2829.1,990.0 L 2924.7,1067.1 L 3004.4,1166.3 L 3068.1,1276.5 L 3100.0,1408.8 L 3004.4,1563.0 L 2908.8,1673.2 L 2781.3,1761.4 L 2606.0,1849.6 L 2398.9,1904.7 L 2159.9,1926.7 L 1889.0,1926.7 L 1602.2,1893.6 L 1331.3,1860.6 L 1108.2,1838.5 L 933.0,1882.6 L 789.6,1926.7 L 614.3,1970.8 L 439.0,1981.8 L 295.6,1937.7 Z" fill="none" stroke="var(--faint)" stroke-width="3"/>
+    </svg>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">2</div>
+    <pre class="grid">
+                                                                                                                        lake
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">3</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">4</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">5</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">6</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+                                               into  an  inlet  an oar into an oak i kneel at it i      look  into it i lean into it i
+                                     take  no note a loon alone on a lit line a tern at a tilt in air a teal an oriole a rail an errant
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">7</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+                                               into  an  inlet  an oar into an oak i kneel at it i      look  into it i lean into it i
+                                     take  no note a loon alone on a lit line a tern at a tilt in air a teal an oriole a rail an errant
+                                 itinerant onlooker a nekton in it a tannin in it a latent iron in it an otter in a rotten net an antler
+                              in  a torrent a laker at noon a tanker at nine a tiller a keel a knot in a net toronto on it trenton on it
+                           an  ontarian at it no one in it to title it no one to tell it no one at all it retain no letter it tolerate no
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">8</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+                                               into  an  inlet  an oar into an oak i kneel at it i      look  into it i lean into it i
+                                     take  no note a loon alone on a lit line a tern at a tilt in air a teal an oriole a rail an errant
+                                 itinerant onlooker a nekton in it a tannin in it a latent iron in it an otter in a rotten net an antler
+                              in  a torrent a laker at noon a tanker at nine a tiller a keel a knot in a net toronto on it trenton on it
+                           an  ontarian at it no one in it to title it no one to tell it no one at all it retain no letter it tolerate no
+                        error  it  take  no  note  attention  intention  iteration  alteration  narration notation lineation orientation
+                     alienation  alliteration  reiteration  toleration  relation  oration ration relation elation one letter later one
+                  letter  later nitrate rain alkaline air alien root aeolian rain not one alien letter a tarn in a lake a rill into a
+
+
+
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">9</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+                                               into  an  inlet  an oar into an oak i kneel at it i      look  into it i lean into it i
+                                     take  no note a loon alone on a lit line a tern at a tilt in air a teal an oriole a rail an errant
+                                 itinerant onlooker a nekton in it a tannin in it a latent iron in it an otter in a rotten net an antler
+                              in  a torrent a laker at noon a tanker at nine a tiller a keel a knot in a net toronto on it trenton on it
+                           an  ontarian at it no one in it to title it no one to tell it no one at all it retain no letter it tolerate no
+                        error  it  take  no  note  attention  intention  iteration  alteration  narration notation lineation orientation
+                     alienation  alliteration  reiteration  toleration  relation  oration ration relation elation one letter later one
+                  letter  later nitrate rain alkaline air alien root aeolian rain not one alien letter a tarn in a lake a rill into a
+               lake  a lake in a lake littoral tale little littoral eternal littoral lateral littoral an atonal loon a rational lake
+             an irrational ration i talk to it it talk to no one i learn no letter i akin to it it not akin to i i take one letter
+          to  it  i  take  one letter or i take it all it eat no oar it eat no iron it eat all it eat an aeon a taker a teller a
+
+
+
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">10</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+                                               into  an  inlet  an oar into an oak i kneel at it i      look  into it i lean into it i
+                                     take  no note a loon alone on a lit line a tern at a tilt in air a teal an oriole a rail an errant
+                                 itinerant onlooker a nekton in it a tannin in it a latent iron in it an otter in a rotten net an antler
+                              in  a torrent a laker at noon a tanker at nine a tiller a keel a knot in a net toronto on it trenton on it
+                           an  ontarian at it no one in it to title it no one to tell it no one at all it retain no letter it tolerate no
+                        error  it  take  no  note  attention  intention  iteration  alteration  narration notation lineation orientation
+                     alienation  alliteration  reiteration  toleration  relation  oration ration relation elation one letter later one
+                  letter  later nitrate rain alkaline air alien root aeolian rain not one alien letter a tarn in a lake a rill into a
+               lake  a lake in a lake littoral tale little littoral eternal littoral lateral littoral an atonal loon a rational lake
+             an irrational ration i talk to it it talk to no one i learn no letter i akin to it it not akin to i i take one letter
+          to  it  i  take  one letter or i take it all it eat no oar it eat no iron it eat all it eat an aeon a taker a teller a
+        tiller  a toiler a loner a laker o lake o little inlet o iron o oak o alkaline o aeolian in air in rain in iron in it
+     in  it in it an era later an aeon later an ontario later nearer nearer a terrain no one enter no one alter i alter no
+   letter  it alter all a rattle a nettle at an inlet a talon on a tern a lilt in a tone letter to letter root to root
+
+</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">11</div>
+    <pre class="grid">
+                                                                                                                        lake
+                                                                                                                    ontario lake
+                                                                         ontario a lake                       to  tell  it  not one
+                                                          letter  in  it alien to it rain into             rain  root  into root iron
+                                               into  an  inlet  an oar into an oak i kneel at it i      look  into it i lean into it i
+                                     take  no note a loon alone on a lit line a tern at a tilt in air a teal an oriole a rail an errant
+                                 itinerant onlooker a nekton in it a tannin in it a latent iron in it an otter in a rotten net an antler
+                              in  a torrent a laker at noon a tanker at nine a tiller a keel a knot in a net toronto on it trenton on it
+                           an  ontarian at it no one in it to title it no one to tell it no one at all it retain no letter it tolerate no
+                        error  it  take  no  note  attention  intention  iteration  alteration  narration notation lineation orientation
+                     alienation  alliteration  reiteration  toleration  relation  oration ration relation elation one letter later one
+                  letter  later nitrate rain alkaline air alien root aeolian rain not one alien letter a tarn in a lake a rill into a
+               lake  a lake in a lake littoral tale little littoral eternal littoral lateral littoral an atonal loon a rational lake
+             an irrational ration i talk to it it talk to no one i learn no letter i akin to it it not akin to i i take one letter
+          to  it  i  take  one letter or i take it all it eat no oar it eat no iron it eat all it eat an aeon a taker a teller a
+        tiller  a toiler a loner a laker o lake o little inlet o iron o oak o alkaline o aeolian in air in rain in iron in it
+     in  it in it an era later an aeon later an ontario later nearer nearer a terrain no one enter no one alter i alter no
+   letter  it alter all a rattle a nettle at an inlet a talon on a tern a lilt in a tone letter to letter root to root
+ rain  to  rain one to one no litter in it   no  error  in it all eaten all not eaten i kneel at it i look into it
+ all  in  it  a  lake  in  a  lake                                       relation oak relation oak</pre>
+  </section>
+  <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">12</div>
+    <div class="note"><p>The poems, made up only of the letters in Lake Ontario, and inspired by the US&#x27; renaming of this shared body of water on August 27, 2026, are set inside an outline of the lake. In the upper right is Prince Edward County; the gap along the lower edge represents the New York shore, which at that latitude divides the water. The poems&#x27; constraints mean that they cannot say the, or and, or water, and that nothing in them is plural, past, or ongoing. Which seems to be an apt allegory of our political situation.</p><p class="by">&#8212; Monique Tschofen</p></div>
+  </section>
+  <section class="leaf understack"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio"></div>
+    <svg class="shore" viewBox="200 990 2900 992" preserveAspectRatio="xMinYMin meet">
+      <path d="M 200.0,1871.6 L 247.8,1816.5 L 327.5,1739.4 L 439.0,1651.2 L 550.5,1552.0 L 646.2,1485.9 L 757.7,1419.8 L 869.2,1331.6 L 996.7,1265.5 L 1156.0,1232.4 L 1331.3,1199.4 L 1506.6,1166.3 L 1697.8,1144.3 L 1873.1,1122.2 L 2016.5,1133.3 L 2144.0,1155.3 L 2239.6,1199.4 L 2319.2,1254.5 L 2398.9,1232.4 L 2478.6,1177.3 L 2590.1,1100.2 L 2717.6,1034.1 L 2829.1,990.0 L 2924.7,1067.1 L 3004.4,1166.3 L 3068.1,1276.5 L 3100.0,1408.8 L 3004.4,1563.0 L 2908.8,1673.2 L 2781.3,1761.4 L 2606.0,1849.6 L 2398.9,1904.7 L 2159.9,1926.7 L 1889.0,1926.7 L 1602.2,1893.6 L 1331.3,1860.6 L 1108.2,1838.5 L 933.0,1882.6 L 789.6,1926.7 L 614.3,1970.8 L 439.0,1981.8 L 295.6,1937.7 Z" fill="none" stroke="var(--faint)" stroke-width="3"/>
+    </svg>
+  </section>
+</div>
+<div class="hint" id="hint">click to turn</div>
+
+<script>
+  const book  = document.getElementById("book");
+  const hint  = document.getElementById("hint");
+  const stack = [...book.querySelectorAll(".leaf:not(.understack)")];
+
+  // Top of the pad first: leaf 0 sits above leaf 1, and so on down.
+  stack.forEach((leaf, i) => leaf.style.zIndex = stack.length - i);
+
+  let at = 0, resetting = false;
+
+  function turn(){
+    if (resetting) return;
+    hint.classList.add("gone");
+
+    if (at >= stack.length){ return; }
+    const leaf = stack[at];
+    leaf.classList.add("turned");
+    at++;
+
+    // The last leaf turns away onto the copy of the cover underneath, so the
+    // book is already showing page one again. Restack while it's identical.
+    if (at === stack.length){
+      resetting = true;
+      setTimeout(() => {
+        stack.forEach(l => { l.style.transition = "none"; l.classList.remove("turned"); });
+        void book.offsetWidth;                       // let the layout settle
+        stack.forEach(l => l.style.transition = "");
+        at = 0; resetting = false;
+      }, 620);
+    }
+  }
+
+  function back(){
+    if (resetting || at === 0) return;
+    at--;
+    stack[at].classList.remove("turned");
+    hint.classList.add("gone");
+  }
+
+  document.body.addEventListener("click", turn);
+  document.addEventListener("keydown", e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "Backspace"){
+      e.preventDefault(); back();
+    } else {
+      e.preventDefault(); turn();          // holding a key riffles the pad
+    }
+  });
+
+  /* Cutive Mono's advance width isn't guaranteed across platforms, so measure
+     the block once the font is in and scale it to the lake's exact width. */
+  function fit(){
+    const target = 2900 * (book.clientWidth / 3300);
+    document.querySelectorAll(".grid").forEach(pre => {
+      pre.style.transform = "none";
+      const w = pre.scrollWidth;
+      if (w > 0) pre.style.transform = "scale(" + (target / w) + ")";
+    });
+  }
+  window.addEventListener("resize", fit);
+  window.addEventListener("load", fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  fit();
+</script>
+
+</body>
+</html>
