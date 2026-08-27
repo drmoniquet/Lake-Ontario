@@ -1,15 +1,5 @@
 <!DOCTYPE html>
-<!--
-  lake ontario — a flip book.
-
-  Twelve leaves hinged at the left edge: an empty lake, the poem filling it line
-  by line, and a note. Click, press a key, or drag a page over with a finger or
-  the mouse. Hold a key down and it riffles. Past the last leaf it comes back to
-  the first.
-
-  The pages are live text, not pictures, so the lake stays sharp at any size and
-  every measurement is the print measurement (a 3300 x 2550 px page at 300 dpi)
-  divided down to fit the screen. One file, no build step. Save as index.html.
+<!--flipbook format with accommodations for phones
 -->
 <html lang="en-CA">
 <head>
@@ -39,8 +29,7 @@
     overflow:hidden;
   }
 
-  /* The book. Perspective is what makes a turning leaf read as paper rather
-     than as a rotating rectangle. */
+  /* The book./
   .book{
     position:relative; width:var(--pw); aspect-ratio:11 / 8.5;
     touch-action:none; overscroll-behavior:contain;
@@ -60,7 +49,7 @@
   .leaf.turned{ transform:rotateY(-179.9deg); }
   .leaf.understack{ z-index:0; transform:none; transition:none; box-shadow:none; }
 
-  /* The binding edge: a little gutter shade down the left of every sheet. */
+  /* The binding edge shades down the left of every sheet. */
   .leaf::before{
     content:""; position:absolute; left:0; top:0; bottom:0;
     width:calc(120 * var(--u));
@@ -347,10 +336,10 @@
      in  it in it an era later an aeon later an ontario later nearer nearer a terrain no one enter no one alter i alter no
    letter  it alter all a rattle a nettle at an inlet a talon on a tern a lilt in a tone letter to letter root to root
  rain  to  rain one to one no litter in it   no  error  in it all eaten all not eaten i kneel at it i look into it
- all  in  it  a  lake  in  a  lake                                       relation oak relation oak</pre>
+ all  in  it  a  lake  in  a  lake                                       relation oar relation oak</pre>
   </section>
   <section class="leaf"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio">12</div>
-    <div class="note"><p>The poems, made up only of the letters in Lake Ontario, and inspired by the US&#x27; renaming of this shared body of water on August 27, 2026, are set inside an outline of the lake. In the upper right is Prince Edward County; the gap along the lower edge represents the New York shore, which at that latitude divides the water. The poems&#x27; constraints mean that they cannot say the, or and, or water, and that nothing in them is plural, past, or ongoing. Which seems to be an apt allegory of our political situation.</p><p class="by">&#8212; Monique Tschofen</p></div>
+    <div class="note"><p>The poems, made up only of the letters in Lake Ontario, and inspired by the US&#x27; renaming of this shared body of water on August 27, 2026, are set inside an outline of the lake. In the upper right is Prince Edward County; the gap along the lower edge represents the New York shore, which at that latitude divides the water. The poetic constraints preclude words like the, or and, or water, and anything plural, past, or ongoing, which seems to be an apt allegory of our political situation.</p><p class="by">&#8212; Monique Tschofen</p></div>
   </section>
   <section class="leaf understack"><div class="title">l a k e   o n t a r i o</div><div class="rule"></div><div class="folio"></div>
     <svg class="shore" viewBox="200 990 2900 992" preserveAspectRatio="xMinYMin meet">
@@ -377,8 +366,7 @@
     stack[at].classList.add("turned");
     at++;
     used();
-    // The last leaf turns away onto the copy of the cover underneath, so the
-    // book is already showing page one again. Restack while it's identical.
+    // The last leaf turns to a copy of the cover underneath 
     if (at === stack.length){
       resetting = true;
       setTimeout(() => {
